@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
-import { Input, Icon, Divider } from 'react-native-elements';
+import { Input, Icon } from 'react-native-elements';
 import _ from 'lodash';
 import { Dropdown } from 'react-native-material-dropdown';
-import * as Colors from '../res/colors';
-import { fetchGHUsers } from '../api/fetchGHUsers';
+
+/*      COMPONENTS AND HELPERS       */
 import ListItem from './common/ListItem';
+import { fetchUserRepos } from '../api/fetchGHUsers';
 import { languageOptions, sortOptions } from '../utils/dropdownOptions';
+
+/*      STYLING        */
+import * as Colors from '../res/colors';
 
 export default class Home extends Component {
 
@@ -19,15 +23,18 @@ export default class Home extends Component {
         message: 'Please enter a user or org name',
     }
 
+    //user clicks search icon
     onSearch = async () => {
         const { userInput, selectedLanguage, selectedSort } = this.state;
-        //fetch users and organizations
+
+        //fetch repos for given users/organization
         if (userInput.length !== 0) {
-            const userRepos = await fetchGHUsers(userInput, selectedLanguage, selectedSort);
+            const userRepos = await fetchUserRepos(userInput, selectedLanguage, selectedSort);
+
             if (userRepos) {
                 this.setState({ userRepos, selectedLanguage: '', selectedSort: '' });
             } else {
-                this.setState({ message: 'No users or organizations found. Please try a different user name.'})
+                this.setState({ userRepos: null, message: 'No users or organizations found. Please try a different user name.' })
             }
         } else {
             this.setState({ errorMessage: 'Please enter a user or organization name' });
@@ -39,6 +46,7 @@ export default class Home extends Component {
         this.setState({ [name]: value, errorMessage: '' });
     }
 
+    //display repos list
     repoList() {
         const { userRepos } = this.state;
         return <FlatList
@@ -55,18 +63,8 @@ export default class Home extends Component {
         />;
     }
 
-    renderResults() {
-        const { userRepos, message } = this.state;
-
-        if (userRepos !== null) {
-            return this.repoList();
-        } else {
-            return <Text style={{ color: Colors.DEFAULT.lightGrayText, }}>{message}</Text>;
-        }
-    }
-
     render() {
-        const { errorMessage } = this.state;
+        const { errorMessage, userRepos, message } = this.state;
 
         const searchIcon = () => <Icon
             name='search'
@@ -80,7 +78,7 @@ export default class Home extends Component {
             <View style={styles.container}>
                 <View style={styles.topContainer}>
                     <View style={styles.searchContainer}>
-                        <Text style={styles.pageTitle}>Search GitHub Users</Text>
+                        <Text style={styles.pageTitle}>Search GitHub Repos by User</Text>
                         <Input
                             placeholder='user or org name'
                             onChangeText={(value) => this.handleInputChange(value, 'userInput')}
@@ -113,9 +111,8 @@ export default class Home extends Component {
                     <View style={{ width: '100%', height: 0.5, backgroundColor: Colors.DEFAULT.lightBlue, opacity: 0.7, marginTop: 10 }} />
                 </View>
                 <View style={styles.resultsContainer}>
-                    {this.renderResults()}
+                    {userRepos !== null ? this.repoList() : <Text style={styles.messageTxt}>{message}</Text>}
                 </View>
-
             </View>
         )
     }
@@ -152,7 +149,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     pageTitle: {
         textAlign: 'center',
@@ -164,5 +160,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         marginTop: -12
+    },
+    messageTxt: {
+        color: Colors.DEFAULT.lightGrayText
     }
 });

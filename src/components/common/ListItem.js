@@ -7,7 +7,6 @@ import * as Colors from '../../res/colors';
 export default class ListItem extends Component {
     render() {
         const { lastUpdated, stars, language, description, name } = this.props;
-        //  const prettyDate = moment(date).local().format("MMM DD YYYY");
         const formattedDate = moment(lastUpdated).format("MMM DD YYYY");
 
         const starIcon = <Icon
@@ -21,20 +20,18 @@ export default class ListItem extends Component {
         return (
             <View style={styles.rootContainer}>
                 <Divider style={styles.divider} />
-                <Text style={styles.title}>{this.props.name}</Text>
-                <Text style={styles.description}>{this.props.description}</Text>
+                <Text style={styles.title}>{name}</Text>
+                <Text style={[styles.description, styles.grayText]}>{description}</Text>
                 <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.language}>{this.props.language}</Text>
+                    <Text style={styles.grayText}>{language}</Text>
                     {starIcon}
-                    <Text style={styles.stars}>{this.props.stars}</Text>
-                    <Text style={styles.date}>Updated {formattedDate}</Text>
+                    <Text style={[styles.grayText, { marginHorizontal: 5 }]}>{stars}</Text>
+                    <Text style={[styles.grayText, { marginLeft: 10 }]}>Updated {formattedDate}</Text>
                 </View>
-
             </View>
         );
     }
 }
-
 
 const styles = StyleSheet.create({
     rootContainer: {
@@ -52,20 +49,9 @@ const styles = StyleSheet.create({
     description: {
         marginVertical: 5,
         fontSize: 16,
-        color: Colors.DEFAULT.lightGrayText,
         fontWeight: '500'
     },
-    stars: {
-        marginHorizontal: 5,
+    grayText: {
         color: Colors.DEFAULT.lightGrayText,
     },
-    language: {
-        color: Colors.DEFAULT.lightGrayText,
-    },
-    date: {
-        color: Colors.DEFAULT.lightGrayText,
-        marginLeft: 10,
-    }
-
-
 });

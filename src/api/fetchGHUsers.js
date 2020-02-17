@@ -1,17 +1,15 @@
 import axios from "axios";
 
-export const fetchGHUsers = (searchTerm, lang, sort) => {
-    //sortTerms --> 'updated' 'stars' 'forks'
-    //filter language --> list of languages
-    console.log("value of lang and sort: ", lang, sort);
+export const fetchUserRepos = (searchTerm, lang, sort) => {
+    //create query string
     const language = lang.length === 0 || lang === 'all' ? '' : `+language:${lang}`;
     const sortTerm = sort.length > 0 ? `+sort:${sort}` : '';
-    const query = `?q=user:${searchTerm}${language}${sortTerm}&per_page=1000`
-    const fetchUsersUrl = `https://api.github.com/search/repositories${query}`;    //GitHub+Octocat+in:readme+
+    const query = `?q=user:${searchTerm}${language}${sortTerm}&per_page=1000`;
 
+    const fetchReposUrl = `https://api.github.com/search/repositories${query}`;
 
     return axios
-        .get(fetchUsersUrl)
+        .get(fetchReposUrl)
         .then(response => {
             console.log("Successfully fetched repos for user!", response);
             return response.data.items;
